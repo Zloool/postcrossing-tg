@@ -1,15 +1,12 @@
 import logging
-
-from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, RegexHandler,
-                          ConversationHandler, Job)
-
+from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
+                          RegexHandler, ConversationHandler, Job)
 from pcconnector import PostCardUser
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                 level=logging.INFO)
 logger = logging.getLogger(__name__)
 REGISTER, GETMAIL, GETPASSWORD = range(3)
-
 pclogin = ''
 pcpass = ''
 listnumber = ''
@@ -24,8 +21,6 @@ def pccheck(bot, job):
     if(listnumber != number):
         bot.sendMessage(job.context, text='You have currently ' + number + ' unsed mails!')
         listnumber = number
-    else:
-        bot.sendMessage(job.context, text='w8 m8')
 
 def start(bot, update):
     bot.sendMessage(chat_id=update.message.chat_id, text="Hi! I am bot, made for checking your PostCrossing account! Type /register to begin") #TODO perepisat
@@ -34,21 +29,15 @@ def start(bot, update):
 def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
 
-#def echo(bot, update):
-#    bot.sendMessage(chat_id=update.message.chat_id, text=update.message.text)
-
-
 def register(bot, update):
     user = update.message.from_user
-#    logger.info("Bio of %s: %s" % (user.first_name, update.message.text))
-    update.message.reply_text('Lets start! Give me your postcrossing.com email, please:')
+    update.message.reply_text('Lets start! Give me your PostCrossing email, please:')
 
     return GETMAIL
 
 def getmail(bot, update):
     global pclogin
     user = update.message.from_user
-#    logger.info("Bio of %s: %s" % (user.first_name, update.message.text))
     pclogin = update.message.text
     update.message.reply_text('Okay, now give me your passwod(yep, thats tottaly insecure):')
 
@@ -58,7 +47,6 @@ def getpassword(bot, update):
     global pcpass
     global listnumber
     user = update.message.from_user
-#    logger.info("Bio of %s: %s" % (user.first_name, update.message.text))
     pcpass = update.message.text
     update.message.reply_text('All done! Now i will check your ackount')
 
@@ -78,8 +66,7 @@ def cancel(bot, update):
     user = update.message.from_user
     logger.info("User %s canceled the conversation." % user.first_name)
     update.message.reply_text('Bye! I hope we can talk again some day.')
-
-    return ConversationHandler.END
+    return ConversationHandler.REGISTER
 
 
 def main():
