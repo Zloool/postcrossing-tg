@@ -11,12 +11,9 @@ class PostCardUser(object):
         """ Start up... """
         self.login = login
         self.password = password
-
         #ctx = ssl.create_default_context()
         #ctx.check_hostname = False
         #ctx.verify_mode = ssl.CERT_NONE
-
-
 
         self.cj = cookielib.CookieJar()
         self.opener = urllib2.build_opener(
@@ -31,9 +28,7 @@ class PostCardUser(object):
             ('User-agent', ('Mozilla/4.0 (compatible; MSIE 6.0; '
                            'Windows NT 5.2; .NET CLR 1.1.4322)'))
         ]
-        #response = requests.get('https://www.postcrossing.com/login')
         self.token = self.gettoken()
-        # need this twice - once to set cookies, once to log in...
 
     def gettoken(self):
         """
@@ -61,8 +56,3 @@ class PostCardUser(object):
         result = re.search(regex, page)
         #return ''.join(response.readlines())
         return result.group(1)
-
-#pc_username = "zloool"
-#pc_password = "gbkbgxer"
-#leros = PostCardUser(pc_username, pc_password)
-#print leros.loginToPC()
