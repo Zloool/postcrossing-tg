@@ -1,52 +1,63 @@
 import logging
-from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
+from telegram.ext import (Updater, CommandHandler,
                           RegexHandler, ConversationHandler, Job)
 from pcconnector import PostCardUser
+from settings import tgtoken
 
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                level=logging.INFO)
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO)
 logger = logging.getLogger(__name__)
 REGISTER, GETMAIL, GETPASSWORD = range(3)
 pclogin = ''
 pcpass = ''
 listnumber = ''
 users = dict()
-updater = Updater(token='YOURTOKENGOESHERE')
+updater = Updater(token=tgtoken)
 jobqueue = updater.job_queue
+
 
 def pccheck(bot, job):
     global listnumber
     pc = PostCardUser(pclogin, pcpass)
     number = pc.loginToPC()
     if(listnumber != number):
-        bot.sendMessage(job.context, text='You have currently ' + number + ' unsed mails!')
+        bot.sendMessage(job.context, text='You have currently ' + number +
+                        ' unsed mails!')
         listnumber = number
 
+
 def start(bot, update):
-    bot.sendMessage(chat_id=update.message.chat_id, text="Hi! I am bot, made for checking your PostCrossing account! Type /register to begin") #TODO perepisat
+    bot.sendMessage(
+        chat_id=update.message.chat_id,
+        text="Hi! I am bot, made for checking your PostCrossing account! Type /register to begin") #TODO perepisat
     return REGISTER
+
 
 def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
 
-def register(bot, update):
-    user = update.message.from_user
-    update.message.reply_text('Lets start! Give me your PostCrossing email, please:')
 
+def register(bot, update):
+    # user = update.message.from_user
+    update.message.reply_text('Lets start! Give me your PostCrossing email, please:')
     return GETMAIL
+
 
 def getmail(bot, update):
     global pclogin
-    user = update.message.from_user
+    # user = update.message.from_user
     pclogin = update.message.text
-    update.message.reply_text('Okay, now give me your passwod(yep, thats tottaly insecure):')
+    update.message.reply_text(
+        'Okay, now give me your passwod(yep, thats tottaly insecure):')
 
     return GETPASSWORD
+
 
 def getpassword(bot, update):
     global pcpass
     global listnumber
-    user = update.message.from_user
+    # user = update.message.from_user
     pcpass = update.message.text
     update.message.reply_text('All done! Now i will check your ackount')
 
@@ -56,10 +67,9 @@ def getpassword(bot, update):
 
     listnumber = number
     chat_id = update.message.chat_id
-    second_checker = Job(pccheck, 1.0, context=chat_id)
+    second_checker = Job(pccheck, 360.0, context=chat_id)
     jobqueue.put(second_checker, next_t=0.0)
     return ConversationHandler.END
-
 
 
 def cancel(bot, update):
@@ -70,16 +80,14 @@ def cancel(bot, update):
 
 
 def main():
-
     dispatcher = updater.dispatcher
-
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],
-
         states={
             REGISTER: [CommandHandler('register', register)],
             GETMAIL: [RegexHandler('^.*$', getmail)],
             GETPASSWORD: [RegexHandler('^.*$', getpassword)],
+            # MessageHandler([Filters.text],echoQ)
         },
 
         fallbacks=[CommandHandler('cancel', cancel)]
