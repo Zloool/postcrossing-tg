@@ -1,6 +1,6 @@
 import logging
-from telegram.ext import (Updater, CommandHandler,
-                          RegexHandler, ConversationHandler, Job)
+from telegram.ext import (Updater, CommandHandler, MessageHandler,
+                          RegexHandler, ConversationHandler, Job, Filters)
 from pcconnector import PostCardUser
 from settings import tgtoken
 
@@ -30,7 +30,8 @@ def pccheck(bot, job):
 def start(bot, update):
     bot.sendMessage(
         chat_id=update.message.chat_id,
-        text="Hi! I am bot, made for checking your PostCrossing account! Type /register to begin") #TODO perepisat
+        text="Hi! I am bot, made for checking your PostCrossing account! Type /register to begin")
+    # TODO perepisat
     return REGISTER
 
 
@@ -85,9 +86,8 @@ def main():
         entry_points=[CommandHandler('start', start)],
         states={
             REGISTER: [CommandHandler('register', register)],
-            GETMAIL: [RegexHandler('^.*$', getmail)],
-            GETPASSWORD: [RegexHandler('^.*$', getpassword)],
-            # MessageHandler([Filters.text],echoQ)
+            GETMAIL: [MessageHandler([Filters.text], getmail)],
+            GETPASSWORD: [MessageHandler([Filters.text], getpassword)],
         },
 
         fallbacks=[CommandHandler('cancel', cancel)]
